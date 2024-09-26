@@ -22,8 +22,6 @@ high_value_customers_sales_file_path = root_output_file_path + 'high_value_custo
 product_analysis_high_value_customer_file_path = root_output_file_path + 'product_analysis_high_value_customer.csv'
 stockcode_quantity_description_table_file_path = root_output_file_path + 'stockcode_quantity_description_table.csv'
 # Vizualisation files
-#Total_Revenue_by_Average_Selling_Price_Product_Category_file_path = root_output_file_path + 'Total_Revenue_by_Average_Selling_Price_Product_Category.png'
-#Total_Quantity_Sold_by_Average_Selling_Price_Product_Category_filepath = root_output_file_path + 'Total_Quantity_Sold_by_Average_Selling_Price_Product_Category.png'
 Total_Revenue_and_Quantity_by_Average_Selling_Price_Category_file_path = root_output_file_path + 'Total_Revenue_and_Quantity_by_Average_Selling_Price_Category.png'
 Top_5_Products_by_Revenue_file_path = root_output_file_path + 'Top_5_Products_by_Revenue.png'
 Top_5_Selling_Products_by_Quantity_file_path = root_output_file_path + 'Top_5_Selling_Products_by_Quantity.png'
@@ -44,6 +42,7 @@ quantity_color_2='#ffa600'
 # Adding low_memory=False to avoid mixed types warning
 raw_data=pd.read_csv(raw_data_file_path, low_memory=False)
 
+print("Performing Data Cleaning")
 # Clean and Filter
 df_cleaned_UK=raw_data[(raw_data['UnitPrice']!=0) & (raw_data['Country']=='United Kingdom')& (raw_data['Quantity']>0)].copy()
 # Update the 'CustomerID' using .loc[] to avoid SettingWithCopyWarning
@@ -80,7 +79,7 @@ product_analysis['average_selling_price_category']=pd.qcut(product_analysis['Ave
 
 
 #Step 10: Identify High Value Customers
-#High-value customers: Top 20% by total revenue
+# High-value customers: Top 20% by total revenue
 
 
 high_value_customers_table = df_cleaned_UK.groupby(['CustomerID']).agg(total_spent=pd.NamedAgg(column='Revenue', aggfunc='sum'))
@@ -115,116 +114,7 @@ product_analysis[['revenue_from_high_value_customers', 'quantitysold_to_high_val
 df_cleaned_UK.to_csv(df_cleaned_UK_file_path, index=False)
 product_analysis.to_csv(product_analysis_file_path, index=False)
 
-"""# Data Visualizations
-
 ## Overview: Sales Distribution Across Product Categories
-Task: Provide an overview of the sales distribution across different product categories based on Average Selling Price.
-Goal: To show the high-level breakdown of how product categories perform in terms average selling price.
-
-Visualization:
-
-1. Bar Plot showing total revenue per Average Selling Price Product Category(Very Low, Low, Medium, High, Very High Range Products).
-2. Bar Plot showing total quantity sold per Average Selling Price Product Category(Very Low, Low, Medium, High, Very High Range Products).
-
-Insight:
-
-which categories are generating the most revenue and which categories are selling the most units?
-
-1. "Medium 40-60% Range" Average Selling Price Products are generating Highest Revenue
-2. "Very Low 0-20% Range" Average Selling Price Products are selling the most units
-
-This introduces the main product categories and sets the stage for deeper exploration into customer segments.
-
-"""
-
-# # Which asp products category generate the most revenue?
-
-
-# import matplotlib.pyplot as plt
-# import matplotlib.ticker as mticker
-
-# def format_func(value, tick_number):
-#     return f'{int(value):,}'  # Formats the number with commas for thousands
-
-
-# # Horizontal Bar plot for Total Revenue by Average Selling Price Product Category
-# plt.figure(figsize=(19, 8))
-
-# # Grouping by average_selling_price_category and summing total_revenue
-# product_analysis_grouped_by_asp_category = product_analysis.groupby('average_selling_price_category', observed=False)['total_revenue'].sum().reset_index()
-
-# # Plotting the horizontal bar chart using plt.barh
-# product_analysis_grouped_by_asp_category = product_analysis_grouped_by_asp_category.sort_values(by='total_revenue', ascending=False)
-
-# bars = plt.barh(product_analysis_grouped_by_asp_category['average_selling_price_category'], product_analysis_grouped_by_asp_category['total_revenue'], height = 0.5, color='#BDE2B9',zorder=2) #BDE2B9
-
-# # Add labels/bar value to the bar
-# for bar in bars:
-#   plt.text(bar.get_width() + (bar.get_width()*0.01), bar.get_y() + bar.get_height()/2,
-#              f'{bar.get_width():,.0f}', va='center')
-
-# #Applying grid
-# plt.grid(True, axis='x', linestyle='--', color='lightgray', alpha=0.5, zorder=0)
-# plt.title('Total Revenue by Average Selling Price Product Category', fontsize=18)
-# plt.xlabel('Total Revenue', fontsize=14)
-# plt.ylabel('Average Selling Price Product Category',fontsize=14)
-
-
-# # Apply the custom formatter to the x-axis to avoid scientific notation
-# plt.gca().xaxis.set_major_formatter(mticker.FuncFormatter(format_func))
-
-
-# # Set x-axis paddings on the right
-# # plt.xlim(0, max(product_analysis_grouped_by_asp_category['total_revenue']) * 1.1)  # Adds 10% padding on the right side
-
-
-# # Rotate x-axis labels for better readability if they are long
-# plt.xticks(rotation=45, ha='right')
-# #set x-axis paddings on the right
-
-# plt.tight_layout()
-# plt.savefig(Total_Revenue_by_Average_Selling_Price_Product_Category_file_path, format='png')
-# plt.show()
-
-
-
-# # Horizontal Bar plot for Total Quantity Sold by Average Selling Price Product Category
-# plt.figure(figsize=(19, 8))
-
-# # Grouping by average_selling_price_category and summing total_quantity_sold
-# product_analysis_grouped_by_quantity_sold = product_analysis.groupby('average_selling_price_category', observed=False)['total_quantity_sold'].sum().reset_index()
-
-# product_analysis_grouped_by_quantity_sold = product_analysis_grouped_by_quantity_sold.sort_values(by='total_quantity_sold', ascending=False)
-
-# # Plotting the horizontal bar chart using plt.barh
-# # bars = plt.barh(product_analysis_grouped_by_quantity_sold.index, product_analysis_grouped_by_quantity_sold.values, height = 0.5, color='#BDE2B9')
-
-# bars = plt.barh(product_analysis_grouped_by_quantity_sold['average_selling_price_category'], product_analysis_grouped_by_quantity_sold['total_quantity_sold'], height = 0.5, color='#BDE2B9') #BDE2B9
-# for bar in bars:
-#   plt.text(bar.get_width() + (bar.get_width()*0.01), bar.get_y() + bar.get_height()/2,
-#              f'{bar.get_width():,.0f}', va='center')
-
-# #Applying grid
-# plt.grid(True, axis='x', linestyle='--', color='lightgray', alpha=0.5, zorder=0)
-# plt.title('Total Quantity Sold by Average Selling Price Product Category', fontsize=18)
-# plt.xlabel('Total Quantity Sold', fontsize=14)
-# plt.ylabel('Average Selling Price Product Category', fontsize=14)
-# # Apply the custom formatter to the x-axis to avoid scientific notation
-# plt.gca().xaxis.set_major_formatter(mticker.FuncFormatter(format_func))
-
-# # Rotate x-axis labels for better readability if they are long
-# plt.xticks(rotation=45, ha='right')
-# #set x-axis paddings on the right
-# # Set x-axis paddings on the right
-# plt.xlim(0, max(product_analysis_grouped_by_quantity_sold['total_quantity_sold']) * 1.1)  # Adds 10% padding on the right side
-
-
-# plt.tight_layout()
-# plt.savefig(Total_Quantity_Sold_by_Average_Selling_Price_Product_Category_filepath, format='png')
-# plt.show()
-
-
-# *********************************************************************************************************
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -292,19 +182,7 @@ plt.savefig(Total_Revenue_and_Quantity_by_Average_Selling_Price_Category_file_pa
 # Show the plot
 plt.show()
 
-"""## 2. Search: Identify Top-Selling Products
-Task: Identify which specific products are the most popular based on total revenue.
-Goal: To search for the top-selling products that contribute the most revenue.
-
-Visualization:
-
-Bar Plot showing the top 10 products by total revenue.
-Bar Plot showing the top 10 products by total quantity sold.
-
-Insight: This gives a more granular view, identifying which individual products drive sales. This will help you discover the most lucrative products within the broader product categories.
-
-
-"""
+## 2. Search: Identify Top-Selling Products
 
 # Step 1: Group by 'StockCode' to find total quantity sold and total revenue
 stockcode_metrics_df = df_cleaned_UK.groupby('StockCode').agg(
@@ -387,18 +265,7 @@ plt.tight_layout()
 plt.savefig(Top_5_Products_by_Revenue_file_path, format='png')
 plt.show()
 
-"""## 3. Trends: Analyze Sales per Average Selling Price Product Category Over Time
-Task: Display how product sales (both quantity sold and revenue) change over time per average_selling_price_category.
-Goal: Analyze how sales trends fluctuate on a monthly basis for different average_selling_price_category.
-
-Visualization:
-
-1. Line Plot for monthly sales revenue per average_selling_price_category (separate lines for each category).
-2. Line Plot for monthly quantity sold per average_selling_price_category
-
-Insight: Uncover any seasonal trends or changes in sales volume over time. This can reveal peak months and allow you to assess whether certain categories perform better at specific times of the year.
-
-"""
+## 3. Trends: Analyze Sales per Average Selling Price Product Category Over Time
 
 # Convert InvoiceDate to datetime if not done already
 df_cleaned_UK['InvoiceDate'] = pd.to_datetime(df_cleaned_UK['InvoiceDate'])
@@ -449,18 +316,7 @@ plt.tight_layout()
 plt.savefig(Monthly_Quantity_Sold_Trend_per_Price_Category_file_path, format='png')
 plt.show()
 
-"""## 4. Comparison: Customer Segmentation (High-Value vs Other Customers)
-Task: Compare how high-value customers and other customers contribute to total revenue in each product category.
-Goal: To segment the customer base into high-value (top 20%) and other customers and compare their contributions.
-
-Visualization:
-
-1. Stacked Bar Plot comparing high-value customer revenue vs other customer revenue across price categories.
-2. Stacked Bar Plot comparing high-value customer total quantity sold vs other customer total quantity sold across price categories.
-
-Insight: Identify how much of the revenue in each price category comes from high-value customers. You’ll also see which price ranges are preferred by these valuable customers.
-
-"""
+## 4. Comparison: Customer Segmentation (High-Value vs Other Customers)
 
 # Group by price category and calculate revenue from high-value and other customers
 category_revenue = product_analysis.groupby('average_selling_price_category', observed=False).agg(
@@ -531,21 +387,19 @@ plt.tight_layout()
 plt.savefig(Total_Quantity_Sold_by_Average_Selling_Price_Product_Category_High_Value_vs_Other_Customers_file_path, format='png')
 plt.show()
 
-"""## 5. Comparison: Top 5 Products by Revenue Generated and Customer Segementation (High-Value vs Other Customers)
-Task: Analyse how high-value customers and other customers purchase Top 10 Products by quantity and Top 10 product by revenue
-"""
+## 5. Comparison: Top 5 Products by Revenue Generated and Customer Segementation (High-Value vs Other Customers)
 
-# Step 2: Add 'Description' column for better readability in plots
+# Step 1: Add 'Description' column for better readability in plots
 product_analysis_description_df = product_analysis.merge(
     df_cleaned_UK[['StockCode', 'Description']], on='StockCode', how='left'
 ).drop_duplicates(subset='StockCode', keep='first')
 
-# Step 3: Sort by total quantity and total revenue
+# Step 2: Sort by total quantity and total revenue
 sorted_by_quantity = product_analysis_description_df.sort_values(by='total_quantity_sold', ascending=False)
 
 sorted_by_revenue = product_analysis_description_df.sort_values(by='total_revenue', ascending=False)
 
-# Step 4: Get top 5 most sold and top 5 by revenue
+# Step 3: Get top 5 most sold and top 5 by revenue
 most_sold_5 = sorted_by_quantity.head(5)
 
 top_5_revenue = sorted_by_revenue.head(5)
@@ -610,20 +464,8 @@ plt.tight_layout()
 plt.savefig(Comparison_Top_5_Products_by_Revenue_they_generate_across_Customer_Segment_file_path, format='png')
 plt.show()
 
-"""## 6. Contribution of high-value customers vs. other customers
-A pie chart or donut chart works well for showing the composition of a whole, especially when comparing proportions between categories. You can layer a donut chart to show multiple levels of data (e.g., revenue by customer segment).
+## 6. Contribution of high-value customers vs. other customers
 
-Use Case:
-Comparing the percentage contribution of high-value customers vs. other customers to total revenue.
-Showing the proportion of total revenue by product category.
-
-Insights:
-Clearly see which categories or customer segments are contributing the most to revenue or sales.
-Layered donut charts can show nested relationships (e.g., comparing customer segments within product categories).
-
-Pie chart for revenue contribution by customer segment
-
-"""
 
 customer_segment_revenue = [
     product_analysis['revenue_from_high_value_customers'].sum(),

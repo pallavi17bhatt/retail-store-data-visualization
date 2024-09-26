@@ -5,7 +5,7 @@ This project is a data visualization and analysis project for a retail store. Th
 * In `./data/` folder, Online_Retail_full_copy.csv
 
 ## How to setup 
-* Install python version 3.11.4
+* Install python version 3.11.4 and pip
 * Install requirements.txt, Run the following command in the project root directory
 ```pip install -r requirements.txt```
 
@@ -17,7 +17,7 @@ numpy==1.23.5
 ```
 
 ## How to run 
-```python retail_data_viz.py```
+```python3 retail_data_viz.py```
 
 ## Output Details 
 The output of this project is a set of visualizations and intermediate csv files that provide insights into the retail store's business. 
