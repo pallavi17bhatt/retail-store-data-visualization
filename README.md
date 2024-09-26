@@ -21,7 +21,7 @@ numpy==1.23.5
 
 ## Output Details 
 The output of this project is a set of visualizations and intermediate csv files that provide insights into the retail store's business. 
-* Output Directory : `./output/`
+* Output Directory : `./output/csvs` and `./output/images/`
 
 This includes:
 
