@@ -11,7 +11,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 root_input_file_path = './data/'
-root_output_file_path = './output_2/'
+root_output_file_path = './output/'
 # input
 raw_data_file_path=root_input_file_path + 'Online_Retail_full_copy.csv'
 # output
